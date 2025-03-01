@@ -1,0 +1,29 @@
+/* Default side panel styling */
+.go806284747 {
+    width: 97px;
+    border-right: 1px solid #E5E5E5;
+}
+
+.go3960841851.bp5-navbar{
+    width: 280px !important;
+}
+.polotno-side-panel {
+    background-color: #FFFFFF; /* Light gray */
+    transition: all 0.3s ease-in-out;
+  }
+  
+.go3977838046 {
+    display: flex;
+    flex-direction: column;
+    justify-items: center;
+    align-items: center;
+    padding-top:0px !important;
+    height: auto !important;
+}
+  /* Active panel style (override default) */
+.go3977838046.polotno-side-panel-tab.active {
+    background-color: transparent; 
+}
+.go3977838046.polotno-side-panel-tab:hover {
+    background-color: transparent; 
+} 
