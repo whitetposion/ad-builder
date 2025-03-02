@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog } from "@headlessui/react";
 import { Pencil } from "lucide-react";
-import { setFileName } from "../../state-manager/slices/preferences";
+import { setFileName, setLoadStore } from "../../state-manager/slices/preferences";
 import { useSelector, useDispatch } from "react-redux";
 
 const Topbar = ({ store }) => {
@@ -12,6 +12,7 @@ const Topbar = ({ store }) => {
     const [height, setHeight] = useState(store.height);
     const fileName = useSelector((state) => state.preferences.fileName);
     const dispatch = useDispatch();
+    const [isSaved, setIsSaved] = useState(false);
     const handleSave = () => {
         store.setSize(width, height);
         setIsOpen(false);
@@ -21,6 +22,15 @@ const Topbar = ({ store }) => {
         dispatch(setFileName(tempFileName));
         setIsTitleOpen(false);
     };
+
+    const handleLoad = () => {
+        dispatch(setLoadStore(store.toJSON()));
+        setIsSaved(true);
+    };
+
+   store.on('change', () => {
+    setIsSaved(false);
+   });
 
     return (
         <div className="flex items-center justify-between sticky w-full z-10 h-[64px] px-4" 
@@ -37,6 +47,12 @@ const Topbar = ({ store }) => {
             
             {/* Second child div - size display with edit button */}
             <div className="flex items-center gap-4 text-white">
+                <button
+                    onClick={handleLoad}
+                    className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded text-white"
+                >
+                    {isSaved ? "Saved!" : "Save"}
+                </button>
                 <div className="flex items-center gap-2 cursor-pointer" onClick={() => setIsOpen(true)}>
                     <span>{store.width} × {store.height}</span>
                     <Pencil className="w-4 h-4" />

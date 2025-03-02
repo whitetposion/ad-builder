@@ -8,6 +8,7 @@ export const preferencesSlice = createSlice({
       sidePanel: 'text',
     },
     fileName: 'Untitled Design',
+    loadStore: null
   },
   reducers: {
     setSidePanel: (state, action) => {
@@ -16,10 +17,14 @@ export const preferencesSlice = createSlice({
     setFileName: (state, action) => {
       state.fileName = action.payload
     },
+    setLoadStore: (state, action) => {  
+      state.loadStore = action.payload
+    }
+
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { setSidePanel, setFileName } = preferencesSlice.actions
+export const { setSidePanel, setFileName, setLoadStore } = preferencesSlice.actions
 
 export default preferencesSlice.reducer

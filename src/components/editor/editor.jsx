@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { PolotnoContainer, SidePanelWrap, WorkspaceWrap } from 'polotno';
 import { Toolbar } from 'polotno/toolbar/toolbar';
 import { PagesTimeline } from 'polotno/pages-timeline';
@@ -10,13 +10,21 @@ import { createStore } from 'polotno/model/store';
 import { sections } from './side-panel';
 import Topbar from '../Topbar/Topbar';
 import './editor.css';
-
+import { useSelector } from 'react-redux';
 const store = createStore({
   key: process.env.POLOTNO_API_KEY,
   showCredit: true,
 });
 
+
 export const Editor = () => {
+  const { loadStore } = useSelector((state) => state.preferences);
+  useEffect(() => {
+    if (loadStore) {
+      store.loadJSON(loadStore, true);
+    }
+  }, [loadStore]);
+
   return (
     <div>
       <Topbar store={store}/>

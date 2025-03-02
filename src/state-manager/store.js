@@ -1,10 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit'
 import preferencesReducer from './slices/preferences'
 import logger from 'redux-logger'
-import { persistReducer } from 'redux-persist'
+import { persistReducer, persistStore } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 
-export default configureStore({
+const store = configureStore({
   reducer: {
     preferences: persistReducer(
       {
@@ -14,5 +14,13 @@ export default configureStore({
       preferencesReducer
     ),
   },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
+  middleware: (getDefaultMiddleware) => 
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
+      },
+    }).concat(logger),
 })
+
+export const persistor = persistStore(store)
+export default store
