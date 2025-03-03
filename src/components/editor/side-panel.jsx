@@ -1,5 +1,5 @@
-import React from 'react';
-import { TextSection, PhotosSection, ElementsSection, UploadSection, BackgroundSection, PagesSection, LayersSection, SizeSection, SectionTab } from 'polotno/side-panel';
+import React, { useEffect, useState } from 'react';
+import { TextSection, PhotosSection, ElementsSection, UploadSection, BackgroundSection, PagesSection, LayersSection, SizeSection, SectionTab, Grid } from 'polotno/side-panel';
 import { cn } from '../../utils/cn';
 
 import { Image as ImageIcon, Shapes, Type, CloudUpload } from 'lucide-react';
@@ -7,25 +7,9 @@ import FeedIcon from '../icons/FeedIcon';
 import './side-panel.css';
 import LayersIcon from '../icons/LayersIcon';
 import FeedItems from '../feed-items';
+import Attribute from '../Attribute';
+import Price from '../Price';
 
-const localImages = [
-    {
-        url: '/assets/bottle.png',
-        title: 'Bottle',
-    },
-    {
-        url: "/assets/camera.png",
-        title: "Camera",
-    },
-    {
-        url: "/assets/headphones.png",
-        title: "Heaphones",
-    },
-    {
-        url: "/assets/watch.png",
-        title: "Watch",
-    },
-]
 
 const CustomSection = {
     name: 'feed',  // Changed to lowercase for consistency
@@ -40,7 +24,18 @@ const CustomSection = {
     ),
     // we need observer to update component automatically on any store changes
     Panel: ({ store }) => {
-        const handleImageClick = ({ url }) => {
+        const [data, setData] = useState([]);
+        const [activeImage, setActiveImage] = useState(null);
+
+        useEffect(() => {
+            fetch("/marpipe_sample_feed.json") // Fetching from public folder
+                .then((response) => response.json())
+                .then((json) => setData(json))
+                .catch((error) => console.error("Error loading JSON:", error));
+        }, []);
+
+        const handleImageClick = (image) => {
+            setActiveImage(image);
             if (!store.activePage) {
                 // Create a new page if none exists
                 store.addPage();
@@ -70,7 +65,7 @@ const CustomSection = {
                 // Add the image element to the active page
                 store.activePage.addElement({
                     type: 'image',
-                    src: url,
+                    src: image.image_link,
                     keepRatio: true,
                     x: centerX,
                     y: centerY,
@@ -80,16 +75,38 @@ const CustomSection = {
             };
 
             // Set the source to trigger the onload
-            img.src = url;
+            img.src = image.image_link;
         };
+
 
         return (
             <div className='flex flex-col items-start'>
-                <p className='h-[20px]'>Images</p>
-                <div className='flex flex-wrap gap-2 overflow-hidden overflow-y-auto max-h-[calc(100vh-114px)]'>
-                    {localImages.map((image) => (
-                        <FeedItems key={image.url} image={image} handleClick={handleImageClick} />
-                    ))}
+                <p className='h-[20px] text-sm font-semibold text-[#4A4A4A] text-left'>Images</p>
+                <div className='h-[calc(100vh-114px)] flex flex-col gap-5'>
+                    <div className='flex flex-wrap gap-2 overflow-hidden overflow-y-auto h-auto max-h-[300px]'>
+                        {data.map((image) => (
+                            <FeedItems key={image.image_link} image={image} handleClick={handleImageClick} />
+                        ))}
+                    </div>
+                    {activeImage && <div className='h-auto overflow-y-auto flex flex-col gap-5'>
+                        <div className='flex flex-col gap-5'>
+                            <div className='text-sm font-semibold text-[#4A4A4A] text-left'>Price</div>
+                            <div className='flex flex-row gap-2'>
+                                <Price label="Price" value={activeImage.price} store={store} />
+                                <Price label="Sale Price" value={activeImage.sale_price} store={store} />
+                            </div>
+                        </div>
+                        <div className='flex flex-col gap-5'>
+                            <div className='text-sm font-semibold text-[#4A4A4A] text-left'>Main Attributes</div>
+                            <div className='flex flex-row flex-wrap gap-2'>
+                                <Attribute label="Brand" value={activeImage.brand} store={store} />
+                                <Attribute label="Title" value={activeImage.title} store={store} />
+                                <Attribute label="Description" value={activeImage.description} store={store} />
+                            </div>
+                        </div>
+
+                    </div>}
+
                 </div>
             </div>
         );
